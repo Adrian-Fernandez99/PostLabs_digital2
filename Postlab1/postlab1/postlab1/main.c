@@ -21,15 +21,18 @@ indican quien ganó.
 // Se definen variables
 
 volatile uint8_t valor_timer0 = 200;	// Variable del timer0
-volatile uint8_t display1 = 5;			// Variable del display1
+volatile uint8_t display1 = 6;			// Variable del display1
+volatile uint8_t disp_show = 0;			// Variable que va a mostrar el display1
 volatile uint8_t conteo = 0;			// Variable del para iniciar el conteo regresivo
 volatile uint8_t inicio = 0;			// Variable del para iniciar el juego
 uint8_t tmr_ovr = 0;					// Variable para verificar el numero de overflows del timer
 volatile uint8_t mark_1 = 0;			// Variable para el marcador del jugador uno
 volatile uint8_t mark_2 = 0;			// Variable para el marcador del jugador dos
+volatile uint8_t ganador = 0;			// Variable para indicar al ganador
 
 void setup();
 uint8_t decaton(uint8_t marca, uint8_t pos);
+void ganancia(uint8_t winn);
 
 int main(void)
 {
@@ -38,9 +41,8 @@ int main(void)
 	
 	while (1)
 	{
-		PORTD = display(1, display1);
-		PORTC = decaton(mark_1, 0);
-		
+		PORTD = display(1, disp_show);
+		ganancia(ganador);
 	}
 }
 
@@ -103,6 +105,26 @@ uint8_t decaton(uint8_t marca, uint8_t pos)
 	return pos;
 }
 
+void ganancia(uint8_t winn)
+{
+	if (winn == 1)
+	{
+		PORTC = (PORTC & 0xF0) | 0x0F;
+		PORTB = (PORTB & 0xF0) | 0x00;
+		disp_show = 1;
+	}
+	else if (winn == 2)
+	{
+		PORTC = (PORTC & 0xF0) | 0x00;
+		PORTB = (PORTB & 0xF0) | 0x0F;
+		disp_show = 2;
+	}
+	else
+	{
+		PORTC = decaton(mark_1, 0);
+	}
+}
+
 // Interrupt routines
 // Interrupción de pinchange
 ISR(PCINT0_vect)
@@ -115,6 +137,7 @@ ISR(PCINT0_vect)
 		{
 			if (conteo == 0)
 			{
+				ganador = 0;
 				conteo = 1;
 			}
 		}
@@ -125,8 +148,10 @@ ISR(PCINT0_vect)
 		{
 			PORTB |= (1 << PORTB3);
 			mark_1 ++;
-			if (mark_1 == 4)
+			if (mark_1 == 5)
 			{
+				mark_1 = 0;
+				ganador = 1;
 				inicio = 0;
 			}
 		}
@@ -136,7 +161,6 @@ ISR(PCINT0_vect)
 			mark_2 ++;
 		}
 	}
-
 	
 	sei();
 }
@@ -151,10 +175,13 @@ ISR(TIMER0_OVF_vect)
 			if (display1 == 0)
 			{
 				inicio = 1;
+				display1 = 6;
+				conteo = 0;
 			}
 			else
 			{
 				display1 = display1 - 1;
+				disp_show = display1;
 			}
 		}
 		tmr_ovr = 0;
