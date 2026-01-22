@@ -63,7 +63,9 @@ void setup()
 	
 	// Se configuran las interrupciones
 	PCMSK0 |= (1 << PORTB4) | (1 << PORTB5);
-	PCICR |= (1 << PCIE0);
+	PCMSK1 |= (1 << PORTC4);
+	
+	PCICR |= (1 << PCIE0) | (1 << PCIE1);
 	
 	CLKPR	= (1 << CLKPCE); // Habilitar cambio en el prescaler
 	CLKPR	= (1 << CLKPS2); // Setea presc a 16 para 1Mhz
@@ -107,21 +109,22 @@ uint8_t decaton(uint8_t marca, uint8_t pos)
 
 void ganancia(uint8_t winn)
 {
-	if (winn == 1)
-	{
-		PORTC = (PORTC & 0xF0) | 0x0F;
-		PORTB = (PORTB & 0xF0) | 0x00;
-		disp_show = 1;
-	}
-	else if (winn == 2)
+	if (winn == 2)
 	{
 		PORTC = (PORTC & 0xF0) | 0x00;
 		PORTB = (PORTB & 0xF0) | 0x0F;
 		disp_show = 2;
 	}
+	else if (winn == 1)
+	{
+		PORTC = (PORTC & 0xF0) | 0x0F;
+		PORTB = (PORTB & 0xF0) | 0x00;
+		disp_show = 1;
+	}
 	else
 	{
 		PORTC = decaton(mark_1, 0);
+		PORTB = decaton(mark_2, 0);
 	}
 }
 
@@ -131,37 +134,54 @@ ISR(PCINT0_vect)
 {
 	cli();
 	// Si el pin está encendido en el pin 4 inicia el juego
-	if (inicio == 0)
+	if (inicio == 1)
 	{
 		if (!(PINB & (1 << PORTB4)))
 		{
-			if (conteo == 0)
-			{
-				ganador = 0;
-				conteo = 1;
-			}
-		}
-	}
-	else if (inicio == 1)
-	{
-		if (!(PINB & (1 << PORTB5)))
-		{
-			PORTB |= (1 << PORTB3);
 			mark_1 ++;
 			if (mark_1 == 5)
 			{
+				mark_2 = 0;
 				mark_1 = 0;
 				ganador = 1;
 				inicio = 0;
 			}
 		}
-		else if (!(PIND & (1 << PORTD4)))
+		else if (!(PINB & (1 << PORTB5)))
 		{
-			PORTB |= (1 << PORTB2);
 			mark_2 ++;
+			if (mark_2 == 5)
+			{
+				ganador = 2;
+				mark_1 = 0;
+				mark_2 = 0;
+				inicio = 0;
+			}
 		}
 	}
 	
+	sei();
+}
+
+ISR(PCINT1_vect)
+{
+	cli();
+	// Si el pin está encendido en el pin 4 inicia el juego
+	if (inicio == 0)
+	{
+		if (!(PINC & (1 << PORTC4)))
+		{
+			if (conteo == 0)
+			{
+				ganador = 0;
+				mark_1 = 0;
+				mark_2 = 0;
+				display1 = 6;
+				disp_show = display1;
+				conteo = 1;
+			}
+		}
+	}
 	sei();
 }
 
