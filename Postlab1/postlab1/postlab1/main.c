@@ -16,13 +16,9 @@ indican quien ganó.
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+#include "Display/Display.h"
 
 // Se definen variables
-const uint8_t TABLA7SEG[16] =
-{
-	0x7E, 0x30, 0x6D, 0x79, 0x33, 0x5B, 0x5F, 0x70, 0x7F, 0x7B, 0x77, 0x7F, 0x4E, 0x7E, 0x4F, 0x47
-};
-//	0,    1,    2,    3,    4,    5,    6,    7,    8,    9,    A,    B,    C,    D,    E,    F
 
 volatile uint8_t valor_timer0 = 200;	// Variable del timer0
 volatile uint8_t display1 = 5;			// Variable del display1
@@ -38,7 +34,7 @@ int main(void)
 	
 	while (1)
 	{
-		PORTD = TABLA7SEG[display1];
+		PORTD = display(1, display1);
 
 		
 	}
