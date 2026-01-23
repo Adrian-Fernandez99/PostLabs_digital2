@@ -52,8 +52,9 @@ void setup()
 	cli();
 	
 	// Se configuran puertos
-	DDRD |= 0xFF;		// Puerto D es salida
+	DDRD |= 0x7F;		// Puerto D es salida
 	PORTD |= 0x00;
+	PORTD |= (1 << PORTD7);
 	
 	DDRC |= 0x0F;		// Puerto C es salida
 	PORTC |= (1 << PORTC4);
@@ -63,9 +64,9 @@ void setup()
 	
 	// Se configuran las interrupciones
 	PCMSK0 |= (1 << PORTB4) | (1 << PORTB5);
-	PCMSK1 |= (1 << PORTC4);
+	PCMSK2 |= (1 << PORTD7);
 	
-	PCICR |= (1 << PCIE0) | (1 << PCIE1);
+	PCICR |= (1 << PCIE0) | (1 << PCIE2);
 	
 	CLKPR	= (1 << CLKPCE); // Habilitar cambio en el prescaler
 	CLKPR	= (1 << CLKPS2); // Setea presc a 16 para 1Mhz
@@ -114,12 +115,14 @@ void ganancia(uint8_t winn)
 		PORTC = (PORTC & 0xF0) | 0x00;
 		PORTB = (PORTB & 0xF0) | 0x0F;
 		disp_show = 2;
+		inicio = 0;
 	}
 	else if (winn == 1)
 	{
 		PORTC = (PORTC & 0xF0) | 0x0F;
 		PORTB = (PORTB & 0xF0) | 0x00;
 		disp_show = 1;
+		inicio = 0;
 	}
 	else
 	{
@@ -144,7 +147,7 @@ ISR(PCINT0_vect)
 				mark_2 = 0;
 				mark_1 = 0;
 				ganador = 1;
-				inicio = 0;
+				
 			}
 		}
 		else if (!(PINB & (1 << PORTB5)))
@@ -155,7 +158,7 @@ ISR(PCINT0_vect)
 				ganador = 2;
 				mark_1 = 0;
 				mark_2 = 0;
-				inicio = 0;
+
 			}
 		}
 	}
@@ -163,13 +166,13 @@ ISR(PCINT0_vect)
 	sei();
 }
 
-ISR(PCINT1_vect)
+ISR(PCINT2_vect)
 {
 	cli();
 	// Si el pin está encendido en el pin 4 inicia el juego
 	if (inicio == 0)
 	{
-		if (!(PINC & (1 << PORTC4)))
+		if (!(PIND & (1 << PORTD7)))
 		{
 			if (conteo == 0)
 			{
@@ -177,7 +180,6 @@ ISR(PCINT1_vect)
 				mark_1 = 0;
 				mark_2 = 0;
 				display1 = 6;
-				disp_show = display1;
 				conteo = 1;
 			}
 		}
@@ -195,7 +197,7 @@ ISR(TIMER0_OVF_vect)
 			if (display1 == 0)
 			{
 				inicio = 1;
-				display1 = 6;
+				display1 = 5;
 				conteo = 0;
 			}
 			else
