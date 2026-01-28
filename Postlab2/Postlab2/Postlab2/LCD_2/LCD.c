@@ -51,14 +51,16 @@ void initLCD8bits(void)
 void LCD_CMD8bit(char a)
 {
 	// RS = 0; // => RS = 0 // Dato en el puerto lo va a interpretar como
-	PORTB &= ~(1<<PORTB0);
-	PORTD = a;
+	PORTB &= ~(1<<PORTB2);
+	PORTD = (PORTD & 0x03) | (a << 2);
+	PORTB = (PORTB & 0xFC) | (a >> 6);
+	
 	
 	// EN = 1; // => E = 1
-	PORTB |= (1<<PORTB1);
+	PORTB |= (1<<PORTB3);
 	_delay_ms(4);
 	// EN = 0; // => E = 0
-	PORTB &= ~(1<<PORTB1);
+	PORTB &= ~(1<<PORTB3);
 }
 
 // Función para colocar en el puerto un valor
@@ -98,13 +100,15 @@ void LCD_Write_Char8bit(char c)
 {
 	
 	// RS = 1; // => RS = 1 // Dato en el puerto la va a interpretar como
-	PORTB |= (1<<PORTB0);
-	PORTD = c;
+	PORTB |= (1<<PORTB2);
+	PORTD = (PORTD & 0x03) | (c << 2);
+	PORTB = (PORTB & 0xFC) | (c >> 6);
+	
 	// EN = 1; // => E = 1
-	PORTB |= (1<<PORTB1);
+	PORTB |= (1<<PORTB3);
 	_delay_ms(4);
 	// EN = 0; // E => 0
-	PORTB &= ~(1<<PORTB1);
+	PORTB &= ~(1<<PORTB3);
 }
 
 // Función para enviar una cadena
