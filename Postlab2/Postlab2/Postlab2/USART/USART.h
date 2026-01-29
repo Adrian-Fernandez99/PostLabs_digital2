@@ -13,6 +13,7 @@
 
 #include <avr/io.h>
 #include <util/delay.h>
+#include <avr/interrupt.h>
 
 void UART_init();
 void write_char(uint8_t direct, char caracter);

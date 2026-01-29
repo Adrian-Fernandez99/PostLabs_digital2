@@ -7,6 +7,7 @@
 #define F_CPU 16000000UL
 #include <avr/io.h>
 #include <util/delay.h>
+#include <avr/interrupt.h>
 
 #include "LCD_2/LCD.h"
 #include "ADC/ADC.h"
@@ -25,12 +26,15 @@ uint16_t dig2_2 = 0;
 uint16_t dig3_2 = 0;
 uint16_t dig4_2 = 0;
 
+uint8_t contador = 0;
+
 int main(void)
 {
-    /* Replace with your application code */
+    cli ();
 	ADC_init();
 	initLCD8bits();
 	UART_init();
+	sei();
 	
     while (1) 
     {
@@ -70,6 +74,52 @@ int main(void)
 		LCD_Write_Char8bit(dig3_2 + '0');
 		LCD_Set_Cursor8bit(10,2);
 		LCD_Write_Char8bit(dig4_2 + '0');
+		
+		LCD_Set_Cursor8bit(12,1);
+		LCD_Write_String8bit("S3:");
+		LCD_Set_Cursor8bit(12,2);
+		LCD_Write_Char8bit(contador + '0');
+		
+		write_str("\n S1: ");
+		write_char(1, dig1 + '0');
+		write_char(1, '.');
+		write_char(1, dig2 + '0');
+		write_char(1, dig3 + '0');
+		write_str(" || S2: ");
+		write_char(1, dig1_2 + '0');
+		write_char(1, dig2_2 + '0');
+		write_char(1, dig3_2 + '0');
+		write_char(1, dig4_2 + '0');
     }
 }
 
+// Interrupt routines
+ISR(USART_RX_vect)
+{
+	cli();
+	
+	char temporal = UDR0;
+	if (temporal == '+')
+	{
+		contador = contador + 1;
+		if (contador == 10)
+		{
+			contador = 0;
+		}
+	}
+	else if (temporal == '-')
+	{
+		if (contador == 0)
+		{
+			contador = 10;
+		}
+		contador = contador - 1;
+	}
+ 	else
+	 {
+		 write_str(" \n Simbolo no valido");
+	 }
+	
+	
+	sei();
+}

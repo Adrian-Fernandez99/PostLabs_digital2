@@ -10,6 +10,7 @@
 #define LCD_H_
 #include <avr/io.h>
 #include <util/delay.h>
+#include <avr/interrupt.h>
 
 void initLCD8bits(void);
 void LCD_CMD8bit(char a);

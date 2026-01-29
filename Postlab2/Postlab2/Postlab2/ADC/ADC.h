@@ -12,6 +12,7 @@
 
 #include <avr/io.h>
 #include <util/delay.h>
+#include <avr/interrupt.h>
 
 void ADC_init();
 uint16_t ADC_read(uint8_t PIN, uint16_t valorcito);

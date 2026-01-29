@@ -8,6 +8,7 @@
 #include "LCD.h"
 #include <avr/io.h>
 #include <util/delay.h>
+#include <avr/interrupt.h>
 
 // Libreria tomada de ejemplo en clase.
 // --------------------------- Funciones para modo 4bits --------------------------------------------
