@@ -31,6 +31,8 @@ uint8_t counter = 0;
 uint16_t numero;   // acumulador
 uint8_t leds = 0;
 
+uint8_t escribir = 0;
+
 void refreshPORT(uint8_t valor);
 void init_master();
 void init_slave();
@@ -47,43 +49,67 @@ int main(void)
 	/* Replace with your application code */
 	while (1) 
 	{
-		PORTC &= ~(1<<PORTC5);
-		
-		SPI_Write('c');
-		SPI_Write(0x00);
+		if (escribir == 0)
+		{
+			PORTC &= ~(1<<PORTC5);
 			
-		valorSPI = SPI_READ(0);
-		
-		ADC_let = (valorSPI * 255UL) / 255UL;			// Se convierte a valor de 0 a 5.
-		dig1 = ADC_let/100;								// Se obtienen unidades y decimales
-		dig2 = (ADC_let / 10) % 10;
-		dig3 = (ADC_let % 10);
-		
-		write_str("\n S1: ");							// Se carga a la terminal cada uno de los ADC
-		write_char(1, dig1 + '0');
- 		write_char(1, dig2 + '0');
- 		write_char(1, dig3 + '0');
-			 
-		SPI_Write('a');
-		SPI_Write(0x00);
+			SPI_Write('c');
+			SPI_Write(0x00);
 			
-		valorSPI = SPI_READ(0);
+			valorSPI = SPI_READ(0);
 			
-		ADC_let2 = (valorSPI * 255UL) / 255UL;			// Se convierte a valor de 0 a 5.
-		dig1_2 = ADC_let2/100;								// Se obtienen unidades y decimales
-		dig2_2 = (ADC_let2 / 10) % 10;
-		dig3_2 = (ADC_let2 % 10);
+			ADC_let = (valorSPI * 255UL) / 255UL;			// Se convierte a valor de 0 a 5.
+			dig1 = ADC_let/100;								// Se obtienen unidades y decimales
+			dig2 = (ADC_let / 10) % 10;
+			dig3 = (ADC_let % 10);
 			
-		write_str(" ||	S2: ");							// Se carga a la terminal cada uno de los ADC
-		write_char(1, dig1_2 + '0');
-		write_char(1, dig2_2 + '0');
-		write_char(1, dig3_2 + '0');
+			write_str("\n S1: ");							// Se carga a la terminal cada uno de los ADC
+			write_char(1, dig1 + '0');
+			write_char(1, dig2 + '0');
+			write_char(1, dig3 + '0');
+			
+			SPI_Write('a');
+			SPI_Write(0x00);
+			
+			valorSPI = SPI_READ(0);
+			
+			ADC_let2 = (valorSPI * 255UL) / 255UL;			// Se convierte a valor de 0 a 5.
+			dig1_2 = ADC_let2/100;								// Se obtienen unidades y decimales
+			dig2_2 = (ADC_let2 / 10) % 10;
+			dig3_2 = (ADC_let2 % 10);
+			
+			write_str(" ||	S2: ");							// Se carga a la terminal cada uno de los ADC
+			write_char(1, dig1_2 + '0');
+			write_char(1, dig2_2 + '0');
+			write_char(1, dig3_2 + '0');
+			
+			PORTC |= (1<<PORTC5);
+		}
 		
-		PORTC |= (1<<PORTC5);
 		
-		refreshPORT(numero);
+		else if (escribir == 1)
+		{
+			if ((numero <= 255) & (numero >= 0))
+			{
+				PORTC &= ~(1<<PORTC5);
+				
+				SPI_Write(numero);
+				
+				write_str(" ||	S3: ");							// Se carga a la terminal cada uno de los ADC
+				write_char(1, valorSPI);
+				
+				PORTC |= (1<<PORTC5);
+				
+				escribir = 0;
+			}
+		}
 		
-		_delay_ms(250);
+		if ((numero <= 255) & (numero >= 0))
+		{
+			refreshPORT(numero);
+		}
+		
+		_delay_ms(100);
 	}
 }
 
@@ -159,7 +185,7 @@ void refreshPORT(uint8_t valor)
 	{
 		PORTD &= ~(1<<PORTD3);
 	}
-	if(valor & 0b00100001)
+	if(valor & 0b00000001)
 	{
 		PORTD |= (1<<PORTD2);
 	}
@@ -192,6 +218,7 @@ ISR(USART_RX_vect)
 		else if (counter == 2)
 		{
 			numero = (numero * 10) + (temp - '0');
+			escribir = 1;
 			counter = 0;
 		}
 	}
