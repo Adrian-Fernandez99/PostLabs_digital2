@@ -27,6 +27,10 @@ uint8_t dig1_2 = 0;			// Valores de ADC en digitos
 uint8_t dig2_2 = 0;
 uint8_t dig3_2 = 0;
 
+uint8_t counter = 0;
+uint16_t numero;   // acumulador
+uint8_t leds = 0;
+
 void refreshPORT(uint8_t valor);
 void init_master();
 void init_slave();
@@ -76,6 +80,8 @@ int main(void)
 		write_char(1, dig3_2 + '0');
 		
 		PORTC |= (1<<PORTC5);
+		
+		refreshPORT(numero);
 		
 		_delay_ms(250);
 	}
@@ -161,4 +167,38 @@ void refreshPORT(uint8_t valor)
 	{
 		PORTD &= ~(1<<PORTD2);
 	}
+}
+
+// Interrupt routines
+ISR(USART_RX_vect)
+{
+	cli();
+	
+	char temp = UDR0;
+	
+	if (temp >= '0' && temp <= '9')
+	{
+		if (counter == 0)
+		{
+			numero = 0;
+			numero = temp - '0';
+			counter = 1;
+		}
+		else if (counter == 1)
+		{
+			numero = (numero * 10) + (temp - '0');
+			counter = 2; 
+		}
+		else if (counter == 2)
+		{
+			numero = (numero * 10) + (temp - '0');
+			counter = 0;
+		}
+	}
+	else
+	{
+		write_char(1, 'O');
+	}
+	
+	sei();
 }
