@@ -18,7 +18,6 @@
 
 #define SlaveAddress 0x10
 
-uint8_t ADC_val = 0;
 uint8_t buffer = 0;
 
 uint16_t TEMP_val;
@@ -41,22 +40,7 @@ int main(void)
     while (1) 
     {
 		TEMP_val = DS_readTemp();
-		
-		write_str("\n temp 1: ");
-		
-		write_str("|| ");
-		write_char(1, (TEMP_val/100) + '0');
-		write_char(1, ((TEMP_val/10) %10) +'0');
-		write_char(1, (TEMP_val%10) +'0');
-		
 		TEMP_val = (TEMP_val / 16);
-		
-		write_str("\n temp: ");
-		
-		write_str("|| ");
-		write_char(1, (TEMP_val/100) + '0');
-		write_char(1, ((TEMP_val/10) %10) +'0');
-		write_char(1, (TEMP_val%10) +'0');
 		
 		if(buffer == 'R')
 		{

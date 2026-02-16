@@ -24,6 +24,9 @@
 #define slave1R (0x10 << 1) | 0x01
 #define slave1W (0x10 << 1) & 0b11111110
 
+#define slave2R (0x15 << 1) | 0x01
+#define slave2W (0x15 << 1) & 0b11111110
+
 uint8_t tp;
 
 uint8_t data_hum[6];
@@ -33,6 +36,9 @@ uint8_t humedad = 0;
 uint8_t buffer_temp = 0;
 uint16_t TEMP_val;
 
+uint8_t buffer_dist = 0;
+uint8_t dist_val = 0;
+
 void refreshPORT(uint8_t valor);
 void init();
 
@@ -41,7 +47,7 @@ int main(void)
 	cli();
 	init();
 	UART_init();
-	I2C_Master_Init(100000, 1);
+	I2C_Master_Init(50000, 1);
 	sei();
 	
     /* Replace with your application code */
@@ -95,37 +101,35 @@ int main(void)
 		write_char(1, '\n');
 		write_str("Humedad:");
 		write_char(1, humedad);
-		_delay_ms(100);
 
+		_delay_ms(100);
 		// Comunicación con el esclavo de temperatura
 		PORTB |= (1<<PORTB5);
-		write_str("\n A ");
 		tp = I2C_Master_Start();
-		write_str("\n B ");
+		
 		if (!tp) return;
-		write_str("\n C ");
 		if (!I2C_Master_Write(slave1W))
 		{
 			I2C_Master_Stop();
 			return;
 		}
-		write_str("\n D ");
+		
 		I2C_Master_Write('R');
-		write_str("\n E ");
+
 		if (!I2C_Master_RepeatedStart())
 		{
 			I2C_Master_Stop();
 			return;
 		}
-		write_str("\n F ");
+
 		if (!I2C_Master_Write(slave1R))
 		{
 			I2C_Master_Stop();
 			return;
 		}
-		write_str("\n G ");
+
 		I2C_Master_Read(&buffer_temp, 0);
-		write_str("\n H ");
+
 		I2C_Master_Stop();
 		
 		PORTB &= ~(1<<PORTB5);
@@ -138,6 +142,48 @@ int main(void)
 		write_char(1, (TEMP_val/100) + '0');
 		write_char(1, ((TEMP_val/10) %10) +'0');
 		write_char(1, (TEMP_val%10) +'0');
+		
+		_delay_ms(100);
+		
+		// Comunicación con el esclavo de distancia
+		PORTB |= (1<<PORTB5);
+		tp = I2C_Master_Start();
+		
+		if (!tp) return;
+		if (!I2C_Master_Write(slave2W))
+		{
+			I2C_Master_Stop();
+			return;
+		}
+		
+		I2C_Master_Write('D');
+
+		if (!I2C_Master_RepeatedStart())
+		{
+			I2C_Master_Stop();
+			return;
+		}
+
+		if (!I2C_Master_Write(slave2R))
+		{
+			I2C_Master_Stop();
+			return;
+		}
+
+		I2C_Master_Read(&buffer_dist, 0);
+
+		I2C_Master_Stop();
+		
+		PORTB &= ~(1<<PORTB5);
+		
+		dist_val = buffer_dist;
+		
+		write_str("\n distancia: ");
+		
+		write_str("|| ");
+		write_char(1, (dist_val/100) + '0');
+		write_char(1, ((dist_val/10) %10) +'0');
+		write_char(1, (dist_val%10) +'0');
 		
 		_delay_ms(100);
     }
