@@ -45,6 +45,7 @@ void init();
 int main(void)
 {
 	cli();
+	initLCD8bits();
 	init();
 	UART_init();
 	I2C_Master_Init(50000, 1);
@@ -184,6 +185,37 @@ int main(void)
 		write_char(1, (dist_val/100) + '0');
 		write_char(1, ((dist_val/10) %10) +'0');
 		write_char(1, (dist_val%10) +'0');
+		
+		// Imprimir en LCD
+		// Sensor de humedad
+		LCD_Set_Cursor8bit(1,1);						// Se setea el cursos en el sitio donde se quiere escribir
+		LCD_Write_String8bit("Hm:");					// Se escribe el primer marcador
+		LCD_Set_Cursor8bit(1,2);						// Se setea el cursos en el sitio donde se quiere escribir
+		LCD_Write_Char8bit((humedad/100) + '0');
+		LCD_Set_Cursor8bit(2,2);						// Se setea el cursos en el sitio donde se quiere escribir
+		LCD_Write_Char8bit(((humedad/10) %10) + '0');
+		LCD_Set_Cursor8bit(3,2);						// Se setea el cursos en el sitio donde se quiere escribir
+		LCD_Write_Char8bit(((humedad) %10) + '0');
+		
+		// Sensor de temperatura
+		LCD_Set_Cursor8bit(5,1);						// Se setea el cursos en el sitio donde se quiere escribir
+		LCD_Write_String8bit("Tm:");					// Se escribe el primer marcador
+		LCD_Set_Cursor8bit(5,2);						// Se setea el cursos en el sitio donde se quiere escribir
+		LCD_Write_Char8bit((TEMP_val/100) + '0');
+		LCD_Set_Cursor8bit(6,2);						// Se setea el cursos en el sitio donde se quiere escribir
+		LCD_Write_Char8bit(((TEMP_val/10) %10) + '0');
+		LCD_Set_Cursor8bit(7,2);						// Se setea el cursos en el sitio donde se quiere escribir
+		LCD_Write_Char8bit(((TEMP_val) %10) + '0');
+		
+		// Sensor ultrasonico
+		LCD_Set_Cursor8bit(9,1);						// Se setea el cursos en el sitio donde se quiere escribir
+		LCD_Write_String8bit("US:");					// Se escribe el primer marcador
+		LCD_Set_Cursor8bit(9,2);						// Se setea el cursos en el sitio donde se quiere escribir
+		LCD_Write_Char8bit((dist_val/100) + '0');
+		LCD_Set_Cursor8bit(10,2);						// Se setea el cursos en el sitio donde se quiere escribir
+		LCD_Write_Char8bit(((dist_val/10) %10) + '0');
+		LCD_Set_Cursor8bit(11,2);						// Se setea el cursos en el sitio donde se quiere escribir
+		LCD_Write_Char8bit(((dist_val) %10) + '0');
 		
 		_delay_ms(100);
     }
