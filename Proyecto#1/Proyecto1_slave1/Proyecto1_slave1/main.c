@@ -58,8 +58,6 @@ int main(void)
 		write_char(1, ((TEMP_val/10) %10) +'0');
 		write_char(1, (TEMP_val%10) +'0');
 		
-		write_str("\n");
-		
 		if(buffer == 'R')
 		{
 			PORTB |= (1<<PORTB5); 
@@ -96,14 +94,14 @@ ISR(TWI_vect)
 		// Slave transmite datos
 		case 0xA8:
 		case 0xB8:
-			TWDR = ADC_val;
+			TWDR = TEMP_val;
 			TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWIE) | (1<<TWEA); 
 			break;
 			
 		case 0xC0:
 		case 0xC8:
 			TWCR = 0;
-			TWCR = (1<<TWEN) | (1<<TWIE) | (1<<TWEA); 
+			TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWIE) | (1<<TWEA); 
 			break;
 			
 		case 0xA0:
