@@ -99,9 +99,8 @@ int main(void)
 				write_char(1, valorSPI);
 				
 				PORTC |= (1<<PORTC5);
-				
-				escribir = 0;
 			}
+			escribir = 0;
 		}
 		
 		if ((numero <= 255) & (numero >= 0))
