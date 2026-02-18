@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include "I2C/I2C.h"
 #include "USART/USART.h"
+#include "LCD/LCD.h"
 
 #define AHT10_HUM   0x38
 #define SLAVE_TEMP   0x10
@@ -51,9 +52,8 @@ int main(void)
 	I2C_Master_Init(50000, 1);
 	sei();
 	
-    /* Replace with your application code */
-    while (1) 
-    {
+	while (1)
+	{
 		
 		PORTB |= (1<<PORTB5);
 		
@@ -88,20 +88,31 @@ int main(void)
 			I2C_Master_Read(&data_hum[i], (i < 5));
 		}
 		
-		hum_val = 
-			((uint32_t)data_hum[1] << 12) |
-			((uint32_t)data_hum[2] << 4)  |
-			((uint32_t)data_hum[3] >> 4);
+		hum_val =
+		((uint32_t)data_hum[1] << 12) |
+		((uint32_t)data_hum[2] << 4)  |
+		((uint32_t)data_hum[3] >> 4);
 		
 		humedad = (hum_val / 1048576.0) * 100.0;		// Fórmula del datasheet
 		
 		I2C_Master_Stop();
 		
 		PORTB &= ~(1<<PORTB5);
-
-		write_char(1, '\n');
-		write_str("Humedad:");
-		write_char(1, humedad);
+		//humedad
+		write_str("h");
+		write_char(1, (humedad/100) + '0');
+		write_char(1, ((humedad/10)%10) + '0');
+		write_char(1, (humedad%10) + '0');
+		write_char(1, ' ');
+		
+		if (humedad >= 58)
+		{
+			PORTC |= (1<<PORTC0);
+		}
+		else
+		{
+			PORTC &= ~(1<<PORTC0);
+		}
 
 		_delay_ms(100);
 		// Comunicación con el esclavo de temperatura
@@ -137,12 +148,11 @@ int main(void)
 		
 		TEMP_val = buffer_temp;
 		
-		write_str("\n temp: ");
-		
-		write_str("|| ");
+		write_str("t");
 		write_char(1, (TEMP_val/100) + '0');
-		write_char(1, ((TEMP_val/10) %10) +'0');
-		write_char(1, (TEMP_val%10) +'0');
+		write_char(1, ((TEMP_val/10)%10) + '0');
+		write_char(1, (TEMP_val%10) + '0');
+		write_char(1, ' ');
 		
 		_delay_ms(100);
 		
@@ -179,13 +189,12 @@ int main(void)
 		
 		dist_val = buffer_dist;
 		
-		write_str("\n distancia: ");
-		
-		write_str("|| ");
+		//distancia
+		write_str("d");
 		write_char(1, (dist_val/100) + '0');
-		write_char(1, ((dist_val/10) %10) +'0');
-		write_char(1, (dist_val%10) +'0');
-		
+		write_char(1, ((dist_val/10)%10) + '0');
+		write_char(1, (dist_val%10) + '0');
+		write_char(1, ' ');
 		// Imprimir en LCD
 		// Sensor de humedad
 		LCD_Set_Cursor8bit(1,1);						// Se setea el cursos en el sitio donde se quiere escribir
@@ -218,7 +227,7 @@ int main(void)
 		LCD_Write_Char8bit(((dist_val) %10) + '0');
 		
 		_delay_ms(100);
-    }
+	}
 }
 
 void init()
@@ -231,6 +240,9 @@ void init()
 	
 	PORTB &= ~((1<<PORTB0) | (1<<PORTB1));
 	PORTD &= ~((1<<PORTD2) | (1<<PORTD3) | (1<<PORTD4) | (1<<PORTD5) | (1<<PORTD6) | (1<<PORTD7));
+	
+	DDRC |= (1<<DDC0);
+	PORTC &= ~(1<<PORTC0);
 
 }
 
