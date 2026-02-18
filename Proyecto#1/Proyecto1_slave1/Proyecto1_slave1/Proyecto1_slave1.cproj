@@ -141,6 +141,12 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="STEPS\STEPS.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="STEPS\STEPS.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="USART\USART.c">
       <SubType>compile</SubType>
     </Compile>
@@ -152,6 +158,7 @@
     <Folder Include="ADC" />
     <Folder Include="I2C" />
     <Folder Include="DS18B20" />
+    <Folder Include="STEPS" />
     <Folder Include="USART" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />

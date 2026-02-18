@@ -15,6 +15,7 @@
 #include "ADC/ADC.h"
 #include "USART/USART.h"
 #include "DS18B20/DS18B20.h"
+#include "STEPS/STEPS.h"
 
 #define SlaveAddress 0x10
 
@@ -22,7 +23,11 @@ uint8_t buffer = 0;
 
 uint16_t TEMP_val;
 
-void refreshPORT(uint8_t valor);
+uint16_t TMR_val = 49911;
+uint8_t segundos = 0;
+
+uint8_t mov_mot = 0;
+
 void init();
 
 int main(void)
@@ -33,7 +38,7 @@ int main(void)
 	DS_init();
 	UART_init();
 	I2C_Slave_Init(SlaveAddress);
-	
+	step_init();
 	sei();
 	
     /* Replace with your application code */
@@ -48,14 +53,16 @@ int main(void)
 			buffer = 0;
 		}
 		
+		mov_step(0);
+		
 		_delay_ms(100);
     }
 }
 
 void init()
 {	
-	DDRB |= (1<<DDB5);
-	PORTB &= ~(1<<PORTB5);
+	DDRB |= (1 << DDB0) | (1 << DDB1) | (1 << DDB2) | (1 << DDB3) | (1 << DDB5);
+	PORTB &= ~(1 << PORTB5);
 }
 
 // Interrupt routines
