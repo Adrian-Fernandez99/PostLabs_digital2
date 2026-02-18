@@ -129,6 +129,12 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="PWM\PWM.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="PWM\PWM.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="ULTRA\ULTRA.c">
       <SubType>compile</SubType>
     </Compile>
@@ -144,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="I2C" />
+    <Folder Include="PWM" />
     <Folder Include="ULTRA" />
     <Folder Include="USART" />
   </ItemGroup>
