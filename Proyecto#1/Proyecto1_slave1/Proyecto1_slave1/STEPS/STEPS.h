@@ -9,6 +9,10 @@
 #ifndef STEPS_H_
 #define STEPS_H_
 
+#define F_CPU 16000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+#include <stdint.h>
 
 void step_init(void);
 void mov_step(uint8_t direccion);

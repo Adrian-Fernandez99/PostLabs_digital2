@@ -8,6 +8,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdint.h>
+#include "STEPS.h"
 
 const uint8_t secuencia_step[8] =
 {
