@@ -14,16 +14,16 @@
 #include "USART/USART.h"
 #include "ULTRA/ULTRA.h"
 #include "I2C/I2C.h"
+#include "PWM/PWM.h"
 
 #define SlaveAddress 0x15
 
 uint8_t distancia = 0;
 uint8_t buffer = 0;
 
-uint8_t servo = 0;
+uint16_t PWM_1 = 0;
 
 void init();
-void PWM_init();
 
 int main(void)
 {
@@ -40,8 +40,8 @@ int main(void)
 		ULTRA_Measure();
 		distancia = ULTRA_GetDistance();
 		
-// 		servo = ((distancia * 200UL / 255) + 25);
-// 		OCR1A = servo;
+		PWM_1 = map_servo(distancia);
+		OCR1A = PWM_1;
 		
 		write_str("\n distancia: ");
 		
@@ -64,20 +64,6 @@ void init()
 {
 	DDRB |= (1<<DDB5);
 	PORTB &= ~(1<<PORTB5);
-
-}
-
-void PWM_init()
-{
-	// Timer 1
-	TCCR1A = (1 << COM1A1) | (1 << COM1B1) | (1 << WGM11);
-	TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS11);  // Modo Fast PWM 14, TOP = ICR1 y prescaler = 8
-
-	ICR1 = 20000;  // Setear Top como 20ms
-	
-	// Timer 2
-	TCCR2A = (1 << COM2A1) | (1 << COM0B1) | (1 << WGM21) | (1 << WGM20); // Configurar Fast PWM, no-inverting mode
-	TCCR2B = (1 << CS22) | (1 << CS20); // Prescaler de
 
 }
 

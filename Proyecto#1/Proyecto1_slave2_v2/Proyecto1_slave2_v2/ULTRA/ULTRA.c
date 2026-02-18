@@ -23,48 +23,38 @@ void ULTRA_init(void)
 	PORTD &= ~(1 << PORTD3);
 
 	// Timer1 en modo normal
-	TCCR1A = 0;
-	TCCR1B = 0;
+	TCCR2A = 0;
+	TCCR2B = 0;
 }
 
 void ULTRA_Measure(void)
 {
-	// Enviar pulso PORTD3 de 10 µs
+	uint16_t overflow_count = 0;
+
 	PORTD |= (1 << PORTD3);
 	_delay_us(10);
 	PORTD &= ~(1 << PORTD3);
 
-	// Esperar flanco alto
-	uint32_t timeout = 0;
-	while (!(PIND & (1 << PORTD4)))
-	{
-		if (++timeout > 60000)
-		return;
-	}
+	while (!(PIND & (1 << PORTD4)));
 
-	// Reiniciar Timer1
-	TCNT1 = 0;
+	TCNT2 = 0;
+	overflow_count = 0;
 
-	// Prescaler 8 ? 0.5 µs por tick
-	TCCR1B = (1 << CS11);
+	TCCR2B = (1 << CS21);   // prescaler 8
 
-	// Esperar flanco bajo
-	timeout = 0;
 	while (PIND & (1 << PORTD4))
 	{
-		if (++timeout > 60000)
-		break;
+		if (TCNT2 == 255)
+		{
+			overflow_count++;
+			TCNT2 = 0;
+		}
 	}
 
-	// Detener timer
-	TCCR1B = 0;
+	TCCR2B = 0;
 
-	duration_ticks = TCNT1;
+	duration_ticks = (overflow_count * 256UL) + TCNT2;
 
-	// Conversión correcta:
-	// 1 cm ? 58 µs
-	// 1 tick = 0.5 µs
-	// 58 µs = 116 ticks
 	distance_cm = duration_ticks / 116;
 }
 

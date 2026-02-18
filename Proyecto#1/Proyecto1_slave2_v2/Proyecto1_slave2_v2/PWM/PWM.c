@@ -14,7 +14,7 @@
 
 void PWM_init()
 {
-	DDRB |= (1 << PINB1) | (1 << PINB2);  // D9 y D10 como salida
+	DDRB |= (1 << PINB1);  // D9 y D10 como salida
 
 	TCCR1A = (1 << COM1A1) | (1 << COM1B1) | (1 << WGM11);
 	TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS11);    // Modo Fast PWM 14, TOP = ICR1 y prescaler = 8
