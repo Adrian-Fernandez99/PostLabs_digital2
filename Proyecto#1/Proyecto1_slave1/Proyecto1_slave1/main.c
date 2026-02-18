@@ -53,7 +53,10 @@ int main(void)
 			buffer = 0;
 		}
 		
-		mov_step(0);
+		if (TEMP_val <= 20)
+		{
+			mov_step(0);	
+		}
 		
 		_delay_ms(100);
     }
@@ -61,7 +64,7 @@ int main(void)
 
 void init()
 {	
-	DDRB |= (1 << DDB0) | (1 << DDB1) | (1 << DDB2) | (1 << DDB3) | (1 << DDB5);
+	DDRB |= (1 << DDB5);
 	PORTB &= ~(1 << PORTB5);
 }
 
