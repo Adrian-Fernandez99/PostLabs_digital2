@@ -40,7 +40,15 @@ int main(void)
 		ULTRA_Measure();
 		distancia = ULTRA_GetDistance();
 		
-		PWM_1 = map_servo(distancia);
+		if (distancia <= 15)
+		{
+			PWM_1 = map_servo(distancia);
+		}
+		else
+		{
+			PWM_1 = 2000UL;
+		}
+		
 		OCR1A = PWM_1;
 		
 		write_str("\n distancia: ");

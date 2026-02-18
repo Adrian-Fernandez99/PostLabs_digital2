@@ -16,9 +16,6 @@
 #include <stdint.h>
 
 void PWM_init();
-void ADC_init();
-
-uint16_t ADC_read(uint8_t PIN);
 uint16_t map_servo(uint16_t ADC_var);
 
 #endif /* PWM_H_ */

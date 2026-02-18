@@ -22,16 +22,8 @@ void PWM_init()
 	ICR1 = 39999;  // Setear Top como 20ms
 }
 
-uint16_t ADC_read(uint8_t PIN)
-{
-	ADMUX = (ADMUX & 0xF0) | (PIN & 0x0F);   // Selecciona canal (0–7)
-	ADCSRA |= (1 << ADSC);                   // Inicia conversión
-	while (ADCSRA & (1 << ADSC));            // Espera a que termine
-	return ADC;                              // Devuelve valor (10 bits)
-}
-
 uint16_t map_servo(uint16_t ADC_var)
 {
-	uint16_t PWM_var = (ADC_var * 2000UL) / 1023 + 2000;
+	uint16_t PWM_var = (ADC_var * 2000UL) / 15;
 	return PWM_var;
 }
